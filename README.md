@@ -1,70 +1,237 @@
-Docker Setup Guide:
 
-1. Download Docker Desktop.
+## Financial Indicators – Company Health Analysis Application
 
-If you install Docker Desktop, it includes everything you need to build images and run containers, including:
-Docker Engine (for running containers)
-Docker CLI (command-line interface for managing Docker)
-Docker Compose (for multi-container applications)
-A Kubernetes environment (optional)
-A GUI Dashboard (for managing containers and images visually)
+Financial Indicators is a full-stack financial analytics application that evaluates public company fundamentals to surface strengths, risks and behavioral trends across Balance Sheets, Income Statements and Cash Flow Statements.
 
-However, here are some additional considerations depending on your use case:
+The system transforms raw financial statement data into interpretable insights, combining trend analysis, financial ratios and rule-based heuristics to highlight **positive indicators** and **red flags** that support exploratory investment and risk assessment workflows.
 
-Windows Users:
--> Ensure WSL 2 (Windows Subsystem for Linux) is installed and enabled (for better performance).
+---
 
-Linux Users:
--> Docker Desktop is not required on Linux. Instead, installing the Docker Engine (docker-ce) is enough.
+### Table of Contents
 
-Mac Users:
--> It works natively on macOS (Intel or Apple Silicon).
--> For Apple Silicon (M1/M2), make sure you're using multi-arch images or emulation.
+- [Features](#features)
+- [Application Overview](#application-overview)
+- [Analytics & Insights](#analytics--insights)
+- [System Architecture](#system-architecture)
+- [Repository Structure](#repository-structure)
+- [Setup & Local Development](#setup--local-development)
+- [Technology Stack](#technology-stack)
+- [Contributions](#contributions)
 
-2. Open Docker Desktop so that Docker Engine keeps running.
+---
 
-2. Open cmd and navigate to root directory of project which contains frontend and backend folders.
+### Features
 
-3. Create Dockerfile containing multi stage build commands for react front-end and python back-end.
+- Ticker-Based Company Search (AAPL, TSLA, NVDA, etc.)
+- Interactive Financial Trend Charts (multi-year)
+- Balance Sheet, Income Statement & Cash Flow Views
+- Metric-Level Drilldowns (assets, liabilities, equity)
+- Automated Positive Indicator Detection
+- Rule-Based Red Flag Identification
+- Dark-Themed Analyst-Friendly UI
+- Modular Backend Services for Analytics Logic
 
-Required Container Directory Structure:
+---
 
-![alt text](readme_images/image.png)
+### Application Overview
 
-4. (optional) Create docker-compose.yml if planning on adding future service integrations.
+#### Landing Page – Company Search
 
-5. Run "docker-compose build --no-cache" from root directory of project where Dockerfile is present.
+![Home](readme_images/1_home.png)
 
-6. Fix any issues in code that might raise exceptions.
+Users begin by searching for a company ticker symbol. The system fetches structured financial data and presents an overview of the firm along with access to detailed analytics.
 
-7. Once image is built, run container using command "docker-compose up"
+---
 
-8. Navigate the link provided "http://127.0.0.1:5000" to verify if app is accessible.
+#### Company Overview & Navigation
 
-9. Check if there are any path issues in front-end from Console (In windows: Ctrl + Shift + I)
+![Overview](readme_images/2_overview.png)
 
-10. To navigate and run commands inside container -
+The interface provides quick navigation between:
+- Balance Sheet
+- Income Statement
+- Statement of Cash Flows  
 
-docker exec -it company_risk_analysis-web-1 sh  -> Opens an interactive shell (sh) inside the Flask container.
-                                                    (here container name -> company_risk_analysis-web-1)
+Each section supports interactive metric selection and historical trend analysis.
 
-ls -l /app/static -> Lists files inside /app/static inside the container.
+---
 
-cat /app/run.py -> Prints the contents of run.py to verify if changes were applied.
+### Analytics & Insights
 
-11. Troubleshoot paths by confirming whether they are properly configured in run.py, index.html, package.json etc within container. 
+#### Balance Sheet Trend
 
+![Balance Sheet](readme_images/3_balance_sheet.png)
 
-Docker Commands:
+Users can explore trends across:
 
-docker-compose build -> Builds the Docker images based on the Dockerfile.
+- Assets
+- Liabilities
+- Equity  
 
-docker-compose build --no-cache -> Forces a rebuild without using cache (ensures fresh changes).
+with granular metrics such as:
 
-docker-compose up -> Starts the containers using docker-compose.yml.
+- Cash & Cash Equivalents
+- Net Receivables
+- Inventory
+- Property, Plant & Equipment
+- Total Assets
 
-docker-compose down -> Stops and removes all running containers and networks.
+---
 
-docker system prune -a -> Removes all unused images, containers, and networks to free up space.
+#### Positive Indicators Panel
 
-docker ps -> Lists running containers.
+![Positive Indicators](readme_images/4_positive_indicators.png)
+
+The panel highlights financial strengths such as:
+
+- Increasing Free Cash Flow
+- Improving Return on Assets (ROA) and Return on Equity (ROE)
+- Expanding Profit Margins
+- Improved operational efficiency
+- Strengthening cash reserves  
+
+These indicators are derived using rule-based comparisons across fiscal periods.
+
+---
+
+#### Red Flags Panel
+
+![Red Flags](readme_images/5_red_flags.png)
+
+Potential risks are flagged when thresholds are crossed, including:
+
+- Rising debt-to-equity ratios
+- Increasing Days Sales Outstanding (DSO)
+- Inventory buildup relative to sales
+- Growth in short-term debt
+- Deterioration in working capital efficiency  
+
+The goal is early risk visibility, not prediction.
+
+---
+
+### System Architecture
+
+```
+React Frontend
+     |
+     | REST API
+     v
+Flask Backend
+ ├── Controllers & Services
+ ├── Analytics Logic
+ │    ├── Positive Indicators
+ │    └── Red Flags
+ ├── SQLite Database
+ └── External Financial Data API
+      (Financial Modeling Prep)
+```
+
+The architecture separates **presentation**, **business logic** and **data access**, allowing analytics rules to evolve independently of the UI.
+
+#### Repository Structure
+
+```
+financial-indicators/
+│
+├── backend/
+│   ├── app/
+│   │   ├── analysis_service.py
+│   │   ├── financial_controller.py
+│   │   ├── financial_service.py
+│   │   ├── positive_indicators_service.py
+│   │   ├── redflags_service.py
+│   │   ├── db.py
+│   │   └── models.py
+│   │
+│   ├── instance/
+│   │   └── lh7.db
+│   │
+│   ├── run.py
+│   ├── requirements.txt
+│   └── runtime.txt
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── package-lock.json
+│
+├── readme_images/
+│   └── *.png
+│
+├── docker-compose.yml
+├── Dockerfile
+├── docker_setup.md
+└── README.md
+```
+
+### Setup & Local Development
+
+#### Prerequisites
+
+-   Python 3.12.6
+-   Node.js v20.17.0
+-   npm 10.8.2
+-   Financial Modeling Prep API key
+    
+----------
+
+#### Backend (Flask)
+
+```
+cd backend
+python -m venv venv
+source venv/bin/activate        # macOS
+# venv\Scripts\activate         # Windows
+pip install -r requirements.txt
+python run.py
+```
+
+Backend runs at:
+
+```
+http://127.0.0.1:5000
+```
+
+----------
+
+#### Frontend (React)
+
+```
+cd frontend
+npm install
+npm start
+```
+
+Frontend runs at:
+
+```
+http://localhost:3000
+```
+### Technology Stack
+
+**Frontend**
+
+-   React
+-   JavaScript (ES6+)
+-   Chart.js
+-   CSS (Dark UI)
+    
+
+**Backend**
+
+-   Python
+-   Flask
+-   SQLite
+-   REST APIs
+    
+
+**Data Source**
+
+-   Financial Modeling Prep API
+
+### Contributions
+
+This project was developed collaboratively as part of a graduate capstone initiative. 
+It incorporates the ideas, analysis and development efforts of Athul Vinod, Harikrishnan Nair, Komal Vashistha and Qianqian Kong.
